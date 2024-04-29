@@ -1,29 +1,11 @@
----
-title: "Data Tidying: Salty Salamanders"
-author: "Georgia Lattig"
-date: "04/29/24"
-output: github_document
----
+Data Tidying: Salty Salamanders
+================
+Georgia Lattig
+04/29/24
 
 ## Load Packages and Data
 
-```{r load-packages, include = FALSE}
-# install.packages("tidyverse")
-# install.packages("broom")
-# install.packages("readr")
-# install.packages("ggplot2")
-# install.packages("dplyr")
-# install.packages("lubridate")
-
-library(tidyverse)
-library(broom)
-library(readr)
-library(ggplot2)
-library(dplyr)
-library(lubridate)
-```
-
-```{r load-data, message = FALSE}
+``` r
 op22 <- read_csv("/Users/georgialattig/salty salamanders/data/raw/otter_point_data - 2022_revised_format.csv")
 op23 <- read_csv("/Users/georgialattig/salty salamanders/data/raw/otter_point_data - 2023.csv")
 op24 <- read_csv("/Users/georgialattig/salty salamanders/data/raw/otter_point_data - 2024.csv")
