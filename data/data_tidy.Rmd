@@ -41,5 +41,7 @@ op24 <- read_csv("/cloud/project/data/raw/otter_point_REFORMATTED - 2024.csv")
 salamanders <- rbind(op16, op17, op18, op19, op20, op21, op22, op23, op24)
 
 write_csv(salamanders, "/cloud/project/data/tidied/otter_point_salamanders.csv")
+
+view(salamanders)
 ```
 
