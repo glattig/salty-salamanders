@@ -17,6 +17,13 @@ library(dplyr)
 library(lubridate)
 ```
 
+```{r add-observation-year-column}
+salamanders %>% 
+  mutate(date = format.Date(date, "%m/%d/%y")) %>% 
+  mutate(year = as.numeric(format(date,'%y')))
+```
+
+
 ## Data Exploration
 
 ```{r glimpse-pit-frequency}

@@ -19,15 +19,69 @@ op24 <- read_csv("/Users/georgialattig/salty salamanders/data/raw/otter_point_RE
 
 ## Data Tidying and Merging
 
+### Reformat Date Columns
+
+``` r
+op16 <- op16 %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(date = format.Date(date, "%m/%d/%Y"))
+```
+
+``` r
+op17 <- op17 %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(date = format.Date(date, "%m/%d/%Y"))
+```
+
+``` r
+op18 <- op18 %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(date = format.Date(date, "%m/%d/%Y"))
+```
+
+``` r
+op19 <- op19 %>% 
+  mutate(date = as.Date(date, "%m/%d/%Y")) %>% 
+  mutate(date = format.Date(date, "%m/%d/%Y"))
+```
+
+``` r
+op20 <- op20 %>% 
+  mutate(date = as.Date(date, "%m/%d/%y")) %>% 
+  mutate(date = format.Date(date, "%m/%d/%Y"))
+```
+
+``` r
+op21 <- op21 %>% 
+  mutate(date = as.Date(date, "%m/%d/%y")) %>% 
+  mutate(date = format.Date(date, "%m/%d/%Y"))
+```
+
 ``` r
 op22 <- op22 %>% 
-  mutate(date = format.Date(date, "%m/%d/%y"))
+  mutate(date = format.Date(date, "%m/%d/%Y"))
 ```
+
+``` r
+op23 <- op23 %>% 
+  mutate(date = as.Date(date, "%m/%d/%y")) %>% 
+  mutate(date = format.Date(date, "%m/%d/%Y"))
+```
+
+``` r
+op24 <- op24 %>% 
+  mutate(date = as.Date(date, "%m/%d/%y")) %>% 
+  mutate(date = format.Date(date, "%m/%d/%Y"))
+```
+
+### Reformat PIT Columns
 
 ``` r
 op22 <- op22 %>% 
   mutate(pit = str_remove_all(pit, "900043000"))
 ```
+
+### Bind All Years’ Data
 
 ``` r
 salamanders <- rbind(op16, op17, op18, op19, op20, op21, op22, op23, op24)
@@ -216,7 +270,7 @@ pits24 <- salamanders %>%
 ```
 
 ``` r
-salamanders <- salamanders %>%
+salamanders <- salamanders %>% 
   mutate(pit_year = as.character(pit_year)) %>% 
   mutate(pit_year = case_when(
     pit %in% pits22$pit ~ "2022",
