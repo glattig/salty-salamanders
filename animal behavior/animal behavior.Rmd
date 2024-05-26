@@ -1,0 +1,42 @@
+
+## Load Packages and Data
+
+```{r load-packages, include = FALSE}
+# install.packages("tidyverse")
+# install.packages("broom")
+# install.packages("readr")
+# install.packages("ggplot2")
+# install.packages("dplyr")
+# install.packages("lubridate")
+
+library(tidyverse)
+library(broom)
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+```
+
+## Data Exploration
+
+```{r glimpse-pit-frequency}
+salamanders %>%
+  count(pit) %>%
+  arrange(desc(n))
+```
+
+
+To date there have been 249 unique PIT tags deployed within the Otter Point population of salamanders. Below I ran some code to see which PIT tags, if any, had multiple years/colors associated with them. Out of 249 PIT tags, 46 are associated with more than one year (first year observed/marked)/color. 
+
+
+## Sex 
+
+```{r}
+salamanders %>% 
+  mutate(year = str_extract(date, {"/dddd"}))
+```
+
+
+
+
+## Age Class
