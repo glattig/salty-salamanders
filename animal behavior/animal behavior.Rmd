@@ -84,7 +84,7 @@ salamanders <- salamanders %>%
 #   select(pit, sex, range24)
 ```
 
-```{r reformat-for-range-analysis}
+```{r create-range-object-for-range-analysis}
 range <- salamanders %>%
   filter(pit != "none",
          pit != "not scanned",
@@ -228,7 +228,7 @@ range <- salamanders %>%
     .default = sex))
 ```
 
-```{r}
+```{r remove-duplicate-rows}
 range <- distinct(range)
 ```
 
@@ -241,6 +241,13 @@ To date there have been 249 unique PIT tags deployed within the Otter Point popu
 ```{r}
 salamanders %>% 
   mutate(year = str_extract(date, {"/dddd"}))
+```
+
+```{r histogram-sex-range}
+range %>% 
+  ggplot(aes(range)) +
+  geom_bar() +
+  facet_wrap(~ year)
 ```
 
 
