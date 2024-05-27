@@ -18,18 +18,218 @@ library(lubridate)
 ```
 
 ```{r add-observation-year-column}
-salamanders %>% 
-  mutate(date = format.Date(date, "%m/%d/%y")) %>% 
-  mutate(year = as.numeric(format(date,'%y')))
+salamanders <- salamanders %>% 
+  mutate(date = as.Date(date, format = "%m/%d/%Y")) %>% 
+  mutate(year = lubridate::year(date))
 ```
-
 
 ## Data Exploration
 
-```{r glimpse-pit-frequency}
-salamanders %>%
-  count(pit) %>%
-  arrange(desc(n))
+```{r create-range-objects-2022-and-2024}
+# range22 <- salamanders %>%
+#   filter(year == "2022") %>%
+#   filter(pit != "none",
+#          pit != "not scanned",
+#          pit != "unknown") %>%
+#   group_by(pit, sex) %>%
+#   count(pool) %>%
+#   arrange(pit) %>%
+#   mutate(range22 = length(pool))
+# 
+# range24 <- salamanders %>%
+#   filter(year == "2024") %>%
+#   filter(pit != "none",
+#          pit != "not scanned") %>%
+#   group_by(pit, sex) %>%
+#   count(pool) %>%
+#   arrange(pit) %>%
+#   mutate(range24 = length(pool))
+```
+
+```{r reformat-sex-range22}
+# range22 <- range22 %>% 
+#   mutate(sex = case_when(
+#     pit == "243359" ~ "f",
+#     .default = sex)) %>% 
+#   select(pit, sex, range22)
+```
+
+```{r reformat sex-range24}
+# range24 <- range24 %>% 
+#   mutate(sex = case_when(
+#     pit == "243230" ~ "m",
+#     pit == "243244" ~ "f",
+#     pit == "243273" ~ "f",
+#     pit == "243282" ~ "m",
+#     pit == "243309" ~ "f",
+#     pit == "243324" ~ "f",
+#     pit == "243328" ~ "m",
+#     pit == "243343" ~ "m",
+#     pit == "243348" ~ "m",
+#     pit == "243357" ~ "f",
+#     pit == "243362" ~ "f",
+#     pit == "243365" ~ "f",
+#     pit == "243399" ~ "m",
+#     pit == "244720" ~ "m",
+#     pit == "244726" ~ "m",
+#     pit == "244741" ~ "m",
+#     pit == "244752" ~ "m",
+#     pit == "244778" ~ "f",
+#     pit == "244830" ~ "m",
+#     pit == "244837" ~ "m",
+#     pit == "244851" ~ "m",
+#     pit == "244868" ~ "m",
+#     pit == "244880" ~ "m",
+#     .default = sex)) %>% 
+#   select(pit, sex, range24)
+```
+
+```{r reformat-for-range-analysis}
+range <- salamanders %>%
+  filter(pit != "none",
+         pit != "not scanned",
+         pit != "unknown") %>%
+  group_by(pit, year, sex) %>%
+  count(pool) %>%
+  arrange(pit) %>%
+  mutate(range = length(pool)) %>% 
+  select(pit, year, sex, range) %>% 
+  mutate(sex = case_when(
+    pit == "243206" ~ "m",
+    pit == "243207" ~ "m",
+    pit == "243209" ~ "m",
+    pit == "243210" ~ "m",
+    pit == "243211" ~ "m",
+    pit == "243212" ~ "m",
+    pit == "243215" ~ "m",
+    pit == "243216" ~ "m",
+    pit == "243218" ~ "m",
+    pit == "243220" ~ "m",
+    pit == "243223" ~ "m",
+    pit == "243227" ~ "m",
+    pit == "243228" ~ "m",
+    pit == "243229" ~ "m",
+    pit == "243230" ~ "m",
+    pit == "243231" ~ "f",
+    pit == "243234" ~ "m",
+    pit == "243235" ~ "f",
+    pit == "243236" ~ "m",
+    pit == "243237" ~ "m",
+    pit == "243241" ~ "m",
+    pit == "243242" ~ "m",
+    pit == "243243" ~ "m",
+    pit == "243244" ~ "f",
+    pit == "243245" ~ "f",
+    pit == "243246" ~ "m",
+    pit == "243248" ~ "m",
+    pit == "243250" ~ "m",
+    pit == "243251" ~ "m",
+    pit == "243253" ~ "m",
+    pit == "243254" ~ "m",
+    pit == "243255" ~ "m",
+    pit == "243257" ~ "m",
+    pit == "243258" ~ "m",
+    pit == "243259" ~ "m",
+    pit == "243260" ~ "m",
+    pit == "243261" ~ "m",
+    pit == "243262" ~ "f",
+    pit == "243263" ~ "f",
+    pit == "243264" ~ "m",
+    pit == "243266" ~ "m",
+    pit == "243272" ~ "f",
+    pit == "243273" ~ "f",
+    pit == "243274" ~ "m",
+    pit == "243275" ~ "m",
+    pit == "243276" ~ "m",
+    pit == "243279" ~ "m",
+    pit == "243281" ~ "m",
+    pit == "243282" ~ "m",
+    pit == "243283" ~ "m",
+    pit == "243284" ~ "f",
+    pit == "243286" ~ "m",
+    pit == "243287" ~ "m",
+    pit == "243289" ~ "m",
+    pit == "243290" ~ "m",
+    pit == "243292" ~ "m",
+    pit == "243293" ~ "m",
+    pit == "243300" ~ "m",
+    pit == "243304" ~ "m",
+    pit == "243305" ~ "m",
+    pit == "243309" ~ "f",
+    pit == "243311" ~ "m",
+    pit == "243315" ~ "f",
+    pit == "243318" ~ "m",
+    pit == "243319" ~ "m",
+    pit == "243320" ~ "m",
+    pit == "243321" ~ "m",
+    pit == "243322" ~ "m",
+    pit == "243324" ~ "f",
+    pit == "243326" ~ "m",
+    pit == "243327" ~ "m",
+    pit == "243328" ~ "m",
+    pit == "243329" ~ "f",
+    pit == "243329" ~ "m",
+    pit == "243330" ~ "m",
+    pit == "243331" ~ "f",
+    pit == "243332" ~ "m",
+    pit == "243337" ~ "m",
+    pit == "243339" ~ "f",
+    pit == "243341" ~ "m",
+    pit == "243343" ~ "m",
+    pit == "243345" ~ "m",
+    pit == "243348" ~ "m",
+    pit == "243350" ~ "f",
+    pit == "243351" ~ "m",
+    pit == "243352" ~ "m",
+    pit == "243354" ~ "m",
+    pit == "243355" ~ "m",
+    pit == "243357" ~ "f",
+    pit == "243358" ~ "m",
+    pit == "243361" ~ "m",
+    pit == "243362" ~ "f",
+    pit == "243363" ~ "m",
+    pit == "243365" ~ "f",
+    pit == "243368" ~ "f",
+    pit == "243370" ~ "f",
+    pit == "243373" ~ "m",
+    pit == "243374" ~ "m",
+    pit == "243375" ~ "m",
+    pit == "243377" ~ "m",
+    pit == "243378" ~ "m",
+    pit == "243379" ~ "m",
+    pit == "243382" ~ "m",
+    pit == "243383" ~ "m",
+    pit == "243384" ~ "m",
+    pit == "243386" ~ "m",
+    pit == "243388" ~ "f",
+    pit == "243389" ~ "m",
+    pit == "243390" ~ "m",
+    pit == "243396" ~ "m",
+    pit == "243397" ~ "m",
+    pit == "243399" ~ "m",
+    pit == "243400" ~ "m",
+    pit == "243401" ~ "m",
+    pit == "243402" ~ "m",
+    pit == "243403" ~ "m",
+    pit == "243404" ~ "m",
+    pit == "244720" ~ "m",
+    pit == "244726" ~ "m",
+    pit == "244741" ~ "m",
+    pit == "244752" ~ "m",
+    pit == "244755" ~ "f",
+    pit == "244778" ~ "f",
+    pit == "244830" ~ "m",
+    pit == "244837" ~ "m",
+    pit == "244851" ~ "m",
+    pit == "244868" ~ "m",
+    pit == "244880" ~ "m",
+    pit == "244887" ~ "m",
+    pit == "243359" ~ "f",
+    .default = sex))
+```
+
+```{r}
+range <- distinct(range)
 ```
 
 
