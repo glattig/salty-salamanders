@@ -1,5 +1,7 @@
 
-## Load Packages and Data
+## Set Up
+
+### Load Packages and Data
 
 ```{r load-packages, include = FALSE}
 # install.packages("tidyverse")
@@ -17,71 +19,12 @@ library(dplyr)
 library(lubridate)
 ```
 
+### Data Wrangling
+
 ```{r add-observation-year-column}
 salamanders <- salamanders %>% 
   mutate(date = as.Date(date, format = "%m/%d/%Y")) %>% 
   mutate(year = lubridate::year(date))
-```
-
-## Data Exploration
-
-```{r create-range-objects-2022-and-2024}
-# range22 <- salamanders %>%
-#   filter(year == "2022") %>%
-#   filter(pit != "none",
-#          pit != "not scanned",
-#          pit != "unknown") %>%
-#   group_by(pit, sex) %>%
-#   count(pool) %>%
-#   arrange(pit) %>%
-#   mutate(range22 = length(pool))
-# 
-# range24 <- salamanders %>%
-#   filter(year == "2024") %>%
-#   filter(pit != "none",
-#          pit != "not scanned") %>%
-#   group_by(pit, sex) %>%
-#   count(pool) %>%
-#   arrange(pit) %>%
-#   mutate(range24 = length(pool))
-```
-
-```{r reformat-sex-range22}
-# range22 <- range22 %>% 
-#   mutate(sex = case_when(
-#     pit == "243359" ~ "f",
-#     .default = sex)) %>% 
-#   select(pit, sex, range22)
-```
-
-```{r reformat sex-range24}
-# range24 <- range24 %>% 
-#   mutate(sex = case_when(
-#     pit == "243230" ~ "m",
-#     pit == "243244" ~ "f",
-#     pit == "243273" ~ "f",
-#     pit == "243282" ~ "m",
-#     pit == "243309" ~ "f",
-#     pit == "243324" ~ "f",
-#     pit == "243328" ~ "m",
-#     pit == "243343" ~ "m",
-#     pit == "243348" ~ "m",
-#     pit == "243357" ~ "f",
-#     pit == "243362" ~ "f",
-#     pit == "243365" ~ "f",
-#     pit == "243399" ~ "m",
-#     pit == "244720" ~ "m",
-#     pit == "244726" ~ "m",
-#     pit == "244741" ~ "m",
-#     pit == "244752" ~ "m",
-#     pit == "244778" ~ "f",
-#     pit == "244830" ~ "m",
-#     pit == "244837" ~ "m",
-#     pit == "244851" ~ "m",
-#     pit == "244868" ~ "m",
-#     pit == "244880" ~ "m",
-#     .default = sex)) %>% 
-#   select(pit, sex, range24)
 ```
 
 ```{r create-range-object-for-range-analysis}
@@ -89,11 +32,11 @@ range <- salamanders %>%
   filter(pit != "none",
          pit != "not scanned",
          pit != "unknown") %>%
-  group_by(pit, year, sex) %>%
+  group_by(pit, year, sex, first_year) %>%
   count(pool) %>%
   arrange(pit) %>%
   mutate(range = length(pool)) %>% 
-  select(pit, year, sex, range) %>% 
+  select(pit, year, sex, first_year, range) %>% 
   mutate(sex = case_when(
     pit == "243206" ~ "m",
     pit == "243207" ~ "m",
@@ -232,18 +175,16 @@ range <- salamanders %>%
 range <- distinct(range)
 ```
 
+## Data Exploration
 
-To date there have been 249 unique PIT tags deployed within the Otter Point population of salamanders. Below I ran some code to see which PIT tags, if any, had multiple years/colors associated with them. Out of 249 PIT tags, 46 are associated with more than one year (first year observed/marked)/color. 
-
-
-## Sex 
+### Sex 
 
 ```{r make-year-column}
 salamanders %>% 
   mutate(year = str_extract(date, {"/dddd"}))
 ```
 
-```{r histogram-sex-range}
+```{r histogram-range}
 range %>% 
   ggplot(aes(range)) +
   geom_bar() +
@@ -266,9 +207,9 @@ sex_range <- range %>%
   slice_head()
 ```
 
-### Analysis
+####  Sex Difference Analysis
 
-```{r sex-range-wilcox-mf-all-years}
+```{r sex-range-view-distribution}
 par(mfrow=c(3,1))
 hist(sex_range$range[sex_range$year=="2022"])
 hist(sex_range$range[sex_range$year=="2023"])
@@ -279,10 +220,144 @@ hist(sex_range$range[sex_range$sex=="m"])
 hist(sex_range$range[sex_range$sex=="f"])
 
 boxplot(sex_range$range~sex_range$sex, ylab="range", xlab="sex")
+```
 
+```{r sex-range-wilcox-mf-22-24}
 wilcox.test(range~sex,data=sex_range)
 ```
 
+```{r boxplot-mf-all-years}
+sex_range %>%
+  mutate(sex = case_when(
+    sex == "f" ~ "Female",
+    sex == "m" ~ "Male"
+  )) %>% 
+  ggplot(aes(x=sex, y=range, fill=sex)) +
+    geom_boxplot() +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+  theme_bw() +
+    labs(title = "Sex Differences in Range During Breeding Season",
+         subtitle = "at Otter Point Across 3 Seasons: 2022-2024",
+         x = "Sex",
+         y = "Number of Breeding Pools",
+         fill = "Sex")
+```
 
+```{r sex-differences-range-histogram}
+sex_range %>%
+  mutate(sex = case_when(
+    sex == "f" ~ "Female",
+    sex == "m" ~ "Male"
+  )) %>% 
+  ggplot(aes(x=range, fill=sex)) +
+    geom_histogram() +
+  facet_wrap(~ sex) +
+  theme_bw() +
+    labs(title = "Sex Differences in Range During Breeding Season",
+         subtitle = "at Otter Point Across 3 Seasons: 2022-2024",
+         x = "Number of Breeding Pools",
+         y = "Number of Individuals",
+         fill = "Sex")
+```
+
+```{r sex-differences-range-density}
+sex_range %>%
+  mutate(sex = case_when(
+    sex == "f" ~ "Female",
+    sex == "m" ~ "Male"
+  )) %>% 
+  ggplot(aes(x=range, fill=sex)) +
+    geom_density(alpha = 0.5) +
+    facet_wrap(~ sex) +
+  theme_bw() +
+    labs(title = "Sex Differences in Range During Breeding Season",
+         subtitle = "at Otter Point Across 3 Seasons: 2022-2024",
+         x = "Number of Breeding Pools",
+         y = "Density of Observations",
+         fill = "Sex")
+```
+
+### Age
+
+```{r slice-first-range}
+age_range <- range %>% 
+  filter(sex == "m" |
+         sex == "f") %>% 
+  drop_na(first_year) %>% 
+  group_by(pit) %>% 
+  slice_head()
+```
+
+
+#### Age Difference Analysis
+```{r view-distributions}
+age_range %>% 
+  filter(first_year != "2023",
+         first_year != "2024") %>% #filtering out 2023 and 2024 because sample sizes are too small
+  ggplot(aes(x = range)) +
+  geom_histogram() +
+  facet_wrap(~ first_year)
+
+par(mfrow=c(3,3))
+hist(sex_range$range[sex_range$first_year=="2017"])
+hist(sex_range$range[sex_range$first_year=="2018"])
+hist(sex_range$range[sex_range$first_year=="2019"])
+hist(sex_range$range[sex_range$first_year=="2020_2021"])
+hist(sex_range$range[sex_range$first_year=="2022"])
+```
+
+```{r age-range-boxplot}
+age_range %>% 
+  filter(first_year != "2023",
+         first_year != "2024") %>% #filtering out 2023 and 2024 because sample sizes are too small
+  mutate(first_year = case_when(
+    first_year == "2017" ~ "8",
+    first_year == "2018" ~ "7",
+    first_year == "2019" ~ "6",
+    first_year == "2020_2021" ~ "4-5",
+    first_year == "2022" ~ "3"
+  )) %>% 
+  ggplot(aes(x = first_year, y = range)) +
+  geom_boxplot() +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+  theme_bw() +
+    labs(title = "Age Differences in Range During Breeding Season",
+         subtitle = "at Otter Point, Across Three Seasons: 2022-2024",
+         x = "Minimum Age (Years)",
+         y = "Number of Breeding Pools")
+```
+
+```{r age-range-histogram}
+age_range %>%
+   filter(first_year != "2023",
+         first_year != "2024") %>% #filtering out 2023 and 2024 because sample sizes are too small
+  mutate(first_year = case_when(
+    first_year == "2017" ~ "> 8 Years",
+    first_year == "2018" ~ "> 7 Years",
+    first_year == "2019" ~ "> 6 Years",
+    first_year == "2020_2021" ~ "> 4-5 Years",
+    first_year == "2022" ~ "> 3 Years"
+  )) %>% 
+  ggplot(aes(x=range)) +
+    geom_histogram() +
+  facet_wrap(~ first_year) +
+  theme_bw() +
+    labs(title = "Age Differences in Range During Breeding Season",
+         subtitle = "at Otter Point, Across Three Seasons: 2022-2024",
+         x = "Number of Breeding Pools",
+         y = "Number of Salamanders")
+```
+
+```{r age-range-kruskal-test-22-24}
+kruskal.test(range~first_year,data=age_range)
+```
 
 
