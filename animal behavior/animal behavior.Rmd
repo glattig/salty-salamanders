@@ -238,7 +238,7 @@ To date there have been 249 unique PIT tags deployed within the Otter Point popu
 
 ## Sex 
 
-```{r}
+```{r make-year-column}
 salamanders %>% 
   mutate(year = str_extract(date, {"/dddd"}))
 ```
@@ -250,7 +250,39 @@ range %>%
   facet_wrap(~ year)
 ```
 
+```{r count-total-sexed-pits}
+total=unique(range$pit[range$sex=="m"])
+length(total)
+
+total=unique(range$pit[range$sex=="f"])
+length(total)
+```
+
+```{r slice-first-range}
+sex_range <- range %>% 
+  filter(sex == "m" |
+         sex == "f") %>% 
+  group_by(pit) %>% 
+  slice_head()
+```
+
+### Analysis
+
+```{r sex-range-wilcox-mf-all-years}
+par(mfrow=c(3,1))
+hist(sex_range$range[sex_range$year=="2022"])
+hist(sex_range$range[sex_range$year=="2023"])
+hist(sex_range$range[sex_range$year=="2024"])
+
+par(mfrow=c(2,1))
+hist(sex_range$range[sex_range$sex=="m"])
+hist(sex_range$range[sex_range$sex=="f"])
+
+boxplot(sex_range$range~sex_range$sex, ylab="range", xlab="sex")
+
+wilcox.test(range~sex,data=sex_range)
+```
 
 
 
-## Age Class
+
