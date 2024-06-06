@@ -199,6 +199,16 @@ total=unique(range$pit[range$sex=="f"])
 length(total)
 ```
 
+```{r}
+range %>% 
+  filter(sex == "m") %>% 
+  filter(year == "2024") %>% 
+  count(sex)
+
+#148 males & 58 females in 2022
+#84 males & 29 females in 2024
+```
+
 ```{r slice-first-range}
 sex_range <- range %>% 
   filter(sex == "m" |
@@ -224,6 +234,8 @@ boxplot(sex_range$range~sex_range$sex, ylab="range", xlab="sex")
 
 ```{r sex-range-wilcox-mf-22-24}
 wilcox.test(range~sex,data=sex_range)
+
+wilcox.test(range~sex,data=sex_range, exact=FALSE)
 ```
 
 ```{r boxplot-mf-all-years}
@@ -235,19 +247,34 @@ sex_range %>%
   ggplot(aes(x=sex, y=range, fill=sex)) +
     geom_boxplot() +
     geom_jitter(color="black", size=0.4, alpha=0.9) +
+    stat_summary(fun.y=mean, geom="crossbar", linetype = "dashed", color="black", width = .75) +
     theme(
       legend.position="none",
       plot.title = element_text(size=11)
     ) +
   theme_bw() +
     labs(title = "Sex Differences in Range During Breeding Season",
-         subtitle = "at Otter Point Across 3 Seasons: 2022-2024",
+         subtitle = "at Otter Point, Across 3 Seasons (2022-2024)",
          x = "Sex",
          y = "Number of Breeding Pools",
          fill = "Sex")
+
+# ggsave("/Users/georgialattig/salty salamanders/visualizations/sex_range_boxplot.jpg", device = "jpg", dpi = 500)
 ```
 
-```{r sex-differences-range-histogram}
+```{r summary-sex-differences}
+sex_range %>% 
+  filter(sex == "f") %>% 
+  summary()
+
+sex_range %>% 
+  filter(sex == "m") %>% 
+  summary()
+```
+
+
+
+```{r sex-differences-range-histogram, fig.width=6.5,fig.height=4}
 sex_range %>%
   mutate(sex = case_when(
     sex == "f" ~ "Female",
@@ -256,9 +283,41 @@ sex_range %>%
   ggplot(aes(x=range, fill=sex)) +
     geom_histogram() +
   facet_wrap(~ sex) +
+  # scale_fill_manual(values=c("gold", "slateblue4")) +
   theme_bw() +
     labs(title = "Sex Differences in Range During Breeding Season",
-         subtitle = "at Otter Point Across 3 Seasons: 2022-2024",
+         subtitle = "at Otter Point, Across 3 Seasons (2022-2024)",
+         x = "Number of Breeding Pools",
+         y = "Number of Individuals",
+         fill = "Sex")
+
+sex_range %>%
+  mutate(sex = case_when(
+    sex == "f" ~ "Female",
+    sex == "m" ~ "Male"
+  )) %>% 
+  ggplot(aes(x=range, fill = sex)) +
+      geom_histogram(position = "fill") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  # scale_fill_manual(values=c("gold", "slateblue4")) +
+  theme_bw() +
+    labs(title = "Sex Differences in A.maculatum Range During the Breeding Season",
+         subtitle = "at Otter Point, Across 3 Seasons (2022-2024)",
+         x = "Number of Breeding Pools",
+         y = "Percent of Individuals",
+         fill = "Sex")
+
+sex_range %>%
+  mutate(sex = case_when(
+    sex == "m" ~ "Male",
+    sex == "f" ~ "Female"
+  )) %>% 
+  ggplot(aes(x=range, fill = sex)) +
+      geom_histogram(position = "dodge") +
+  # scale_fill_manual(values=c("gold", "slateblue4")) +
+  theme_bw() +
+    labs(title = "Sex Differences in A.maculatum Range During the Breeding Season",
+         subtitle = "at Otter Point, Across 3 Seasons (2022-2024)",
          x = "Number of Breeding Pools",
          y = "Number of Individuals",
          fill = "Sex")
@@ -294,6 +353,7 @@ age_range <- range %>%
 
 
 #### Age Difference Analysis
+
 ```{r view-distributions}
 age_range %>% 
   filter(first_year != "2023",
@@ -324,6 +384,7 @@ age_range %>%
   ggplot(aes(x = first_year, y = range)) +
   geom_boxplot() +
     geom_jitter(color="black", size=0.4, alpha=0.9) +
+  # stat_summary(fun.y=mean, geom="crossbar", linetype = "dashed", color="black", width = .75) +
     theme(
       legend.position="none",
       plot.title = element_text(size=11)
